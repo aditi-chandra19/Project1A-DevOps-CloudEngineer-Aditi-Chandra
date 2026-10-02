@@ -1,0 +1,34 @@
+name: NovaPay source gate and build
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  compile:
+    name: Source gate and Java 21 compile
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
+
+      - name: Check available JDK
+        shell: bash
+        run: |
+          command -v javac
+          javac -version
+
+      - name: Run local source safety gate
+        shell: pwsh
+        run: ./scripts/check-source-policy.ps1
+
+      - name: Compile without external dependencies
+        shell: bash
+        run: |
+          mkdir -p .build
+          javac --release 21 --add-modules jdk.httpserver \
+            -d .build \
+            src/main/java/com/novapay/demo/NovaPayDemo.java
+          test -f .build/com/novapay/demo/NovaPayDemo.class
