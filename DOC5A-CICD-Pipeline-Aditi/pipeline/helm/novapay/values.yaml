@@ -1,9 +1,17 @@
+# Route the stable Service to this slot: blue or green.
+activeColor: blue
 replicaCount: 2
 
-image:
-  repository: artifactory.novapay.example/novapay/demo
-  digest: ""
-  pullPolicy: IfNotPresent
+# Supply approved image digests for both slots before installing the chart.
+images:
+  blue:
+    repository: artifactory.novapay.example/novapay/demo
+    digest: ""
+    pullPolicy: IfNotPresent
+  green:
+    repository: artifactory.novapay.example/novapay/demo
+    digest: ""
+    pullPolicy: IfNotPresent
 
 service:
   type: ClusterIP

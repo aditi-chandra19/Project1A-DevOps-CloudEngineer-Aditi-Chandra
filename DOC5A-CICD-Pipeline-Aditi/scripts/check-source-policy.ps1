@@ -8,14 +8,13 @@ if (-not (Test-Path -LiteralPath $SourcePath -PathType Leaf)) {
     throw "Java source file not found: $SourcePath"
 }
 
-# Local preflight rules for this dependency-free demo. This is not a substitute for
-# a maintained SAST scanner such as Semgrep or SonarQube.
+# These are quick checks for this demo, not a full SAST scan.
 $rules = @(
     @{
         Id = "NP-SEC-001"
         Severity = "HIGH"
-        Pattern = '(?i)(password|passwd|secret|api[_-]?key|access[_-]?token)\s*[:=]\s*["''][^"'']{8,}["'']'
-        Message = "Possible hard-coded credential or token. Read secrets from an approved secret store."
+        Pattern = '(?i)(password|passwd|secret|api[_-]?key|access[_-]?token)\s*[:=]\s*".{8,}"'
+        Message = "Possible hard-coded credential. Keep secrets out of source code."
     },
     @{
         Id = "NP-SEC-002"
@@ -27,19 +26,19 @@ $rules = @(
         Id = "NP-SEC-003"
         Severity = "HIGH"
         Pattern = 'Runtime\.getRuntime\(\)\.exec\s*\(|new\s+ProcessBuilder\s*\('
-        Message = "Shell process execution requires a reviewed, constrained design."
+        Message = "Review shell process execution before allowing it."
     },
     @{
         Id = "NP-SEC-004"
         Severity = "HIGH"
         Pattern = 'new\s+ObjectInputStream\s*\('
-        Message = "Native Java deserialization is blocked by default due to gadget risks."
+        Message = "Review native Java deserialization before allowing it."
     },
     @{
         Id = "NP-SEC-005"
         Severity = "HIGH"
-        Pattern = 'new\s+InetSocketAddress\s*\(\s*["''](0\.0\.0\.0|::)["'']'
-        Message = "The demo server must bind to loopback for local-only execution."
+        Pattern = 'new\s+InetSocketAddress\s*\(\s*"(0\.0\.0\.0|::)"'
+        Message = "The local demo must bind to loopback."
     }
 )
 
@@ -60,12 +59,8 @@ for ($index = 0; $index -lt $lines.Count; $index++) {
 }
 
 $report = [pscustomobject]@{
-    scanner = "NovaPay local source policy preflight"
-    scannerVersion = "0.1.0"
-    scannerType = "custom-pattern-check; not full SAST"
-    threshold = "block on any HIGH finding"
+    check = "NovaPay source checks"
     result = if ($findings.Count -eq 0) { "PASS" } else { "FAIL" }
-    findingCount = $findings.Count
     findings = @($findings)
 }
 

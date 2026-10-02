@@ -10,6 +10,7 @@ spec:
   selector:
     app.kubernetes.io/name: novapay-demo
     app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/slot: {{ .Values.activeColor | quote }}
   ports:
     - name: http
       port: {{ .Values.service.port }}

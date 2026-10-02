@@ -1,16 +1,16 @@
 {
   "$schema": "https://json-schema.org/draft-07/schema#",
   "type": "object",
-  "required": ["image", "replicaCount", "resources", "service"],
+  "required": ["activeColor", "images", "replicaCount", "resources", "service"],
   "properties": {
+    "activeColor": { "type": "string", "enum": ["blue", "green"] },
     "replicaCount": { "type": "integer", "minimum": 2 },
-    "image": {
+    "images": {
       "type": "object",
-      "required": ["repository", "digest", "pullPolicy"],
+      "required": ["blue", "green"],
       "properties": {
-        "repository": { "type": "string", "pattern": "^artifactory\\.novapay\\.example/novapay/[a-z0-9._/-]+$" },
-        "digest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
-        "pullPolicy": { "type": "string", "enum": ["IfNotPresent", "Always"] }
+        "blue": { "$ref": "#/definitions/image" },
+        "green": { "$ref": "#/definitions/image" }
       },
       "additionalProperties": false
     },
@@ -35,6 +35,16 @@
     "terminationGracePeriodSeconds": { "type": "integer", "minimum": 5, "maximum": 300 }
   },
   "definitions": {
+    "image": {
+      "type": "object",
+      "required": ["repository", "digest", "pullPolicy"],
+      "properties": {
+        "repository": { "type": "string", "pattern": "^artifactory\\.novapay\\.example/novapay/[a-z0-9._/-]+$" },
+        "digest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+        "pullPolicy": { "type": "string", "enum": ["IfNotPresent", "Always"] }
+      },
+      "additionalProperties": false
+    },
     "cpuMemory": {
       "type": "object",
       "required": ["cpu", "memory"],

@@ -18,6 +18,7 @@ jobs:
         shell: bash
         run: |
           command -v javac
+          command -v jdeps
           javac -version
 
       - name: Run local source safety gate
@@ -32,3 +33,7 @@ jobs:
             -d .build \
             src/main/java/com/novapay/demo/NovaPayDemo.java
           test -f .build/com/novapay/demo/NovaPayDemo.class
+
+      - name: Inventory referenced JDK modules (not a vulnerability scan)
+        shell: pwsh
+        run: ./scripts/inventory-java-modules.ps1

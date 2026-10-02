@@ -1,12 +1,16 @@
+{{- $root := . }}
+{{- range $color := list "blue" "green" }}
+{{- $image := index $root.Values.images $color }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Release.Name }}-demo
+  name: {{ printf "%s-%s" $root.Release.Name $color }}
   labels:
     app.kubernetes.io/name: novapay-demo
-    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/instance: {{ $root.Release.Name }}
+    app.kubernetes.io/slot: {{ $color }}
 spec:
-  replicas: {{ .Values.replicaCount }}
+  replicas: {{ $root.Values.replicaCount }}
   minReadySeconds: 5
   revisionHistoryLimit: 5
   strategy:
@@ -17,14 +21,16 @@ spec:
   selector:
     matchLabels:
       app.kubernetes.io/name: novapay-demo
-      app.kubernetes.io/instance: {{ .Release.Name }}
+      app.kubernetes.io/instance: {{ $root.Release.Name }}
+      app.kubernetes.io/slot: {{ $color }}
   template:
     metadata:
       labels:
         app.kubernetes.io/name: novapay-demo
-        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/instance: {{ $root.Release.Name }}
+        app.kubernetes.io/slot: {{ $color }}
     spec:
-      terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
+      terminationGracePeriodSeconds: {{ $root.Values.terminationGracePeriodSeconds }}
       securityContext:
         runAsNonRoot: true
         runAsUser: 10001
@@ -33,8 +39,8 @@ spec:
           type: RuntimeDefault
       containers:
         - name: novapay-demo
-          image: {{ printf "%s@%s" .Values.image.repository (required "set image.digest to the SHA-256 digest of the approved image" .Values.image.digest) | quote }}
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          image: {{ printf "%s@%s" $image.repository (required (printf "set images.%s.digest to the approved SHA-256 digest" $color) $image.digest) | quote }}
+          imagePullPolicy: {{ $image.pullPolicy }}
           ports:
             - name: http
               containerPort: 8080
@@ -45,7 +51,7 @@ spec:
             - name: NOVAPAY_BIND_ADDRESS
               value: "0.0.0.0"
             - name: NOVAPAY_ENVIRONMENT
-              value: {{ .Release.Namespace | quote }}
+              value: {{ $root.Release.Namespace | quote }}
           startupProbe:
             httpGet:
               path: /health/live
@@ -65,7 +71,7 @@ spec:
             periodSeconds: 5
             failureThreshold: 2
           resources:
-            {{- toYaml .Values.resources | nindent 12 }}
+            {{- toYaml $root.Values.resources | nindent 12 }}
           securityContext:
             allowPrivilegeEscalation: false
             privileged: false
@@ -80,3 +86,5 @@ spec:
         - name: tmp
           emptyDir:
             sizeLimit: 32Mi
+---
+{{- end }}

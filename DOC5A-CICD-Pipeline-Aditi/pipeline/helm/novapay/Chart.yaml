@@ -1,6 +1,6 @@
 apiVersion: v2
 name: novapay-demo
-description: Minimal NovaPay reference service chart with hardened defaults
+description: NovaPay demo chart with blue-green release slots and hardened defaults
 type: application
 version: 0.1.0
 appVersion: "0.1.0"
