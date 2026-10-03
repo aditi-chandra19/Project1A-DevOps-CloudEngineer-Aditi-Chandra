@@ -2,7 +2,6 @@ package novapay.admission.approved_image_digests
 
 import rego.v1
 
-# Reserved example registry. Replace only with the approved registry for a real environment.
 approved_registry := "artifactory.novapay.example/novapay/"
 
 valid_digest_image(image) if {

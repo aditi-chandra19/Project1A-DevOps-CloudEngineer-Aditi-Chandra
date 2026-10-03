@@ -13,10 +13,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.LongAdder;
 
-/**
- * Local-only NovaPay assessment simulator. It never processes or stores real payment data.
- * Failure injection is explicit and intended for safe deployment/rollback demonstrations.
- */
 public final class NovaPayDemo {
     private static final String SERVICE_NAME = "novapay-demo";
     private static final String DEFAULT_VERSION = "0.1.0+local";
@@ -84,8 +80,6 @@ public final class NovaPayDemo {
                     "/api/payments/authorize");
             return;
         }
-        // This simulator deliberately discards the request body and never logs payment data.
-
         String failure = exchange.getRequestHeaders().getFirst("X-Demo-Failure");
         if (failure == null || failure.isBlank()) {
             respond(exchange, 202, "application/json; charset=utf-8",

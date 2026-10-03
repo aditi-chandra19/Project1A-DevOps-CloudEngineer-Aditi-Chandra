@@ -7,7 +7,6 @@ param(
     [uri]$CandidateUrl
 )
 
-# Port-forward the slot's preview Service, then pass its local URL here.
 $ErrorActionPreference = "Stop"
 $baseUrl = $CandidateUrl.AbsoluteUri.TrimEnd("/")
 $checks = [System.Collections.Generic.List[object]]::new()
@@ -44,6 +43,7 @@ if ($allPassed) {
 $report = [pscustomobject]@{
     candidateColor = $CandidateColor
     candidateUrl = $baseUrl
+    checkedAtUtc = [DateTime]::UtcNow.ToString("o")
     result = if ($allPassed) { "PASS" } else { "HOLD" }
     checks = @($checks)
     recommendation = $recommendation
