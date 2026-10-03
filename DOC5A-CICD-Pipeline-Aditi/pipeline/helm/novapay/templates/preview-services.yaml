@@ -1,5 +1,6 @@
 {{- $root := . }}
 {{- range $color := list "blue" "green" }}
+# Check a slot here before switching the stable Service to it.
 apiVersion: v1
 kind: Service
 metadata:

@@ -8,7 +8,7 @@ if (-not (Test-Path -LiteralPath $SourcePath -PathType Leaf)) {
     throw "Java source file not found: $SourcePath"
 }
 
-# These are quick checks for this demo, not a full SAST scan.
+
 $rules = @(
     @{
         Id = "NP-SEC-001"

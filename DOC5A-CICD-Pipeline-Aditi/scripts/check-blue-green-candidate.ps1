@@ -7,6 +7,7 @@ param(
     [uri]$CandidateUrl
 )
 
+# Port-forward the slot's preview Service, then pass its local URL here.
 $ErrorActionPreference = "Stop"
 $baseUrl = $CandidateUrl.AbsoluteUri.TrimEnd("/")
 $checks = [System.Collections.Generic.List[object]]::new()
@@ -34,20 +35,21 @@ foreach ($path in @("/health/live", "/health/ready", "/version")) {
     }
 }
 
-$failedChecks = @($checks | Where-Object result -ne "PASS")
+$allPassed = @($checks | Where-Object { $_.result -ne "PASS" }).Count -eq 0
+$recommendation = "Keep traffic on the current slot and investigate the failed checks."
+if ($allPassed) {
+    $recommendation = "Checks passed. An operator can now set activeColor to $CandidateColor."
+}
+
 $report = [pscustomobject]@{
     candidateColor = $CandidateColor
     candidateUrl = $baseUrl
-    result = if ($failedChecks.Count -eq 0) { "PASS" } else { "HOLD" }
+    result = if ($allPassed) { "PASS" } else { "HOLD" }
     checks = @($checks)
-    nextStep = if ($failedChecks.Count -eq 0) {
-        "Candidate checks passed. An operator may now switch activeColor to $CandidateColor."
-    } else {
-        "Keep traffic on the current slot and investigate the failed checks."
-    }
+    recommendation = $recommendation
 }
 
 $report | ConvertTo-Json -Depth 4
-if ($failedChecks.Count -gt 0) {
+if (-not $allPassed) {
     exit 1
 }
