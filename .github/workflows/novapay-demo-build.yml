@@ -50,3 +50,87 @@ jobs:
       - name: Inventory referenced JDK modules (not a vulnerability scan)
         shell: pwsh
         run: ./pipeline/scripts/inventory-java-modules.ps1
+
+  container-security:
+    name: Container build, smoke check, vulnerability gate, and SBOM
+    runs-on: ubuntu-latest
+    needs: compile
+    defaults:
+      run:
+        working-directory: DOC5A-CICD-Pipeline-Aditi
+    steps:
+      - name: Check out source
+        uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3
+
+      - name: Build the demo image
+        run: docker build --pull --tag novapay-demo:${{ github.sha }} .
+
+      - name: Start the image and check the demo endpoints
+        shell: bash
+        run: |
+          docker run --detach --name novapay-demo-ci \
+            --publish 127.0.0.1:8080:8080 \
+            --env GIT_SHA=${GITHUB_SHA} \
+            --env NOVAPAY_ENVIRONMENT=ci \
+            novapay-demo:${GITHUB_SHA}
+
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:8080/health/ready >/dev/null; then
+              break
+            fi
+            sleep 1
+          done
+
+          curl --fail --silent http://127.0.0.1:8080/health/live
+          curl --fail --silent http://127.0.0.1:8080/health/ready
+          curl --fail --silent http://127.0.0.1:8080/version | grep --fixed-strings "${GITHUB_SHA}"
+
+          status=$(curl --silent --output payment-response.json --write-out '%{http_code}' \
+            --request POST --header 'Content-Type: application/json' \
+            --data '{}' http://127.0.0.1:8080/api/payments/authorize)
+          test "$status" = "202"
+          grep --fixed-strings '"simulation":true' payment-response.json
+
+      - name: Scan the image and save a machine-readable report
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25
+        with:
+          image-ref: novapay-demo:${{ github.sha }}
+          format: json
+          output: ${{ runner.temp }}/trivy-image-report.json
+          exit-code: '0'
+          ignore-unfixed: true
+          vuln-type: os,library
+          severity: CRITICAL,HIGH
+
+      - name: Block images with Critical or High vulnerabilities
+        shell: bash
+        run: |
+          findings=$(jq '[.Results[]?.Vulnerabilities[]? | select(.Severity == "CRITICAL" or .Severity == "HIGH")] | length' \
+            "${RUNNER_TEMP}/trivy-image-report.json")
+          echo "Critical/High image findings: ${findings}"
+          test "$findings" -eq 0
+
+      - name: Generate an image SBOM
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25
+        with:
+          image-ref: novapay-demo:${{ github.sha }}
+          format: cyclonedx
+          output: ${{ runner.temp }}/novapay-image.cdx.json
+          exit-code: '0'
+          scanners: vuln
+
+      - name: Keep image scan and SBOM reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: novapay-container-security-${{ github.sha }}
+          path: |
+            ${{ runner.temp }}/trivy-image-report.json
+            ${{ runner.temp }}/novapay-image.cdx.json
+            DOC5A-CICD-Pipeline-Aditi/payment-response.json
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Stop the demo container
+        if: always()
+        run: docker rm --force novapay-demo-ci || true
