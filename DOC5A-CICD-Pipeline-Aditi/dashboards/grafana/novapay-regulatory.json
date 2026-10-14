@@ -1,0 +1,102 @@
+{
+  "__inputs": [
+    {
+      "name": "DS_PROMETHEUS",
+      "label": "Prometheus",
+      "description": "Prometheus data source for NovaPay evidence metrics",
+      "type": "datasource",
+      "pluginId": "prometheus",
+      "pluginName": "Prometheus"
+    }
+  ],
+  "annotations": { "list": [] },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": { "defaults": { "unit": "percentunit", "min": 0, "max": 1 }, "overrides": [] },
+      "gridPos": { "h": 7, "w": 8, "x": 0, "y": 0 },
+      "id": 1,
+      "targets": [{ "expr": "sum(novapay_gate_evaluations_total{result=\"pass\"}) / clamp_min(sum(novapay_gate_evaluations_total), 1)", "legendFormat": "Gate pass ratio", "refId": "A" }],
+      "title": "Required gate pass ratio",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": { "defaults": { "unit": "short", "min": 0 }, "overrides": [] },
+      "gridPos": { "h": 7, "w": 8, "x": 8, "y": 0 },
+      "id": 2,
+      "targets": [{ "expr": "sum(novapay_security_findings{severity=\"CRITICAL\"})", "legendFormat": "Critical findings", "refId": "A" }],
+      "title": "Open Critical findings",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": { "defaults": { "unit": "short", "min": 0 }, "overrides": [] },
+      "gridPos": { "h": 7, "w": 8, "x": 16, "y": 0 },
+      "id": 3,
+      "targets": [{ "expr": "sum(novapay_security_findings{severity=\"HIGH\"})", "legendFormat": "High findings", "refId": "A" }],
+      "title": "Open High findings",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": { "defaults": { "unit": "percentunit", "min": 0, "max": 1 }, "overrides": [] },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 7 },
+      "id": 4,
+      "targets": [{ "expr": "sum(novapay_signature_verifications_total{result=\"valid\"}) / clamp_min(sum(novapay_signature_verifications_total), 1)", "legendFormat": "Valid signature checks", "refId": "A" }],
+      "title": "Artifact signature verification",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": { "defaults": { "unit": "short", "min": 0 }, "overrides": [] },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 7 },
+      "id": 5,
+      "targets": [{ "expr": "sum(novapay_sbom_generated_total)", "legendFormat": "Generated SBOMs", "refId": "A" }],
+      "title": "SBOM generation records",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": { "defaults": { "unit": "short", "min": 0 }, "overrides": [] },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 15 },
+      "id": 6,
+      "targets": [{ "expr": "sum(novapay_policy_decisions_total{result=\"deny\"}) by (policy)", "legendFormat": "{{policy}}", "refId": "A" }],
+      "title": "Policy denials by policy",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": { "defaults": { "unit": "short", "min": 0 }, "overrides": [] },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 15 },
+      "id": 7,
+      "targets": [{ "expr": "sum(novapay_release_approval_events_total{result=\"approved\"})", "legendFormat": "Approved events", "refId": "A" }],
+      "title": "Recorded release approvals",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": { "defaults": { "unit": "none" }, "overrides": [] },
+      "gridPos": { "h": 5, "w": 24, "x": 0, "y": 23 },
+      "id": 8,
+      "options": { "mode": "markdown", "content": "**Audit boundary:** these panels require a connected evidence exporter and verified release records. They do not replace immutable gate JSON, approval identities, source/image digests, or retained scan artifacts. Missing data means evidence is unavailable, not that a control passed." },
+      "title": "Evidence interpretation",
+      "type": "text"
+    }
+  ],
+  "refresh": "5m",
+  "schemaVersion": 39,
+  "tags": ["novapay", "regulatory", "compliance", "assessment", "design-only"],
+  "templating": { "list": [] },
+  "time": { "from": "now-30d", "to": "now" },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "NovaPay Compliance Evidence",
+  "uid": "novapay-regulatory-evidence",
+  "version": 1
+}

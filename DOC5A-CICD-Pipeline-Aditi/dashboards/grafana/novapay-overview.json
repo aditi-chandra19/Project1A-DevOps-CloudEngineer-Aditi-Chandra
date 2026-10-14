@@ -23,7 +23,7 @@
       "fieldConfig": { "defaults": { "unit": "percentunit", "min": 0, "max": 1 }, "overrides": [] },
       "gridPos": { "h": 8, "w": 8, "x": 0, "y": 0 },
       "id": 1,
-      "targets": [{ "expr": "1 - (sum(rate(http_requests_total{service=\"novapay-demo\",status=~\"5..\"}[5m])) / clamp_min(sum(rate(http_requests_total{service=\"novapay-demo\"}[5m])), 0.001))", "legendFormat": "Availability", "refId": "A" }],
+      "targets": [{ "expr": "1 - (sum(rate(novapay_demo_http_requests_total{status=~\"5..\"}[5m])) / clamp_min(sum(rate(novapay_demo_http_requests_total[5m])), 0.001))", "legendFormat": "Availability", "refId": "A" }],
       "title": "Request success ratio",
       "type": "stat"
     },
@@ -32,7 +32,7 @@
       "fieldConfig": { "defaults": { "unit": "percentunit", "min": 0 }, "overrides": [] },
       "gridPos": { "h": 8, "w": 8, "x": 8, "y": 0 },
       "id": 2,
-      "targets": [{ "expr": "sum(rate(http_requests_total{service=\"novapay-demo\",status=~\"5..\"}[5m])) / clamp_min(sum(rate(http_requests_total{service=\"novapay-demo\"}[5m])), 0.001)", "legendFormat": "HTTP 5xx", "refId": "A" }],
+      "targets": [{ "expr": "sum(rate(novapay_demo_http_requests_total{status=~\"5..\"}[5m])) / clamp_min(sum(rate(novapay_demo_http_requests_total[5m])), 0.001)", "legendFormat": "HTTP 5xx", "refId": "A" }],
       "title": "HTTP 5xx rate",
       "type": "timeseries"
     },
@@ -65,22 +65,40 @@
     },
     {
       "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
-      "fieldConfig": { "defaults": { "unit": "short", "min": 0 }, "overrides": [] },
+      "fieldConfig": { "defaults": { "unit": "percent", "min": 0, "max": 100 }, "overrides": [] },
       "gridPos": { "h": 8, "w": 24, "x": 0, "y": 16 },
       "id": 6,
-      "targets": [{ "expr": "novapay_dora_deployments_total{metric=~\"deployment_frequency|change_failure_rate|lead_time|time_to_restore\"}", "legendFormat": "{{metric}}", "refId": "A" }],
-      "title": "DORA metrics (publish only from verified release records)",
+      "targets": [{ "expr": "novapay_canary_traffic_percent{service=\"novapay-demo\"}", "legendFormat": "Candidate traffic", "refId": "A" }],
+      "title": "Current canary traffic weight",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": { "defaults": { "unit": "percentunit", "min": 0 }, "overrides": [] },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 24 },
+      "id": 7,
+      "targets": [{ "expr": "novapay_canary_error_ratio{service=\"novapay-demo\"}", "legendFormat": "{{deployment_color}}", "refId": "A" }],
+      "title": "Canary error rate by color",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": { "defaults": { "unit": "short", "min": 0 }, "overrides": [] },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 24 },
+      "id": 8,
+      "targets": [{ "expr": "increase(novapay_rollbacks_total{service=\"novapay-demo\"}[24h])", "legendFormat": "{{category}}", "refId": "A" }],
+      "title": "Rollback events in last 24 hours",
       "type": "timeseries"
     }
   ],
   "refresh": "30s",
   "schemaVersion": 39,
-  "tags": ["novapay", "assessment", "design-only"],
+  "tags": ["novapay", "engineering", "assessment", "design-only"],
   "templating": { "list": [] },
   "time": { "from": "now-6h", "to": "now" },
   "timepicker": {},
   "timezone": "browser",
-  "title": "NovaPay Release Safety and DORA",
-  "uid": "novapay-release-safety",
+  "title": "NovaPay Engineering Operations",
+  "uid": "novapay-engineering-operations",
   "version": 1
 }

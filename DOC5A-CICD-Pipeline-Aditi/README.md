@@ -17,7 +17,7 @@ This project designs and demonstrates a controlled CI/CD pipeline for a fictiona
 | 5. Environment promotion | [Promotion strategy](docs/05-environment-promotion/environment-promotion.md) | Designed; no four-environment deployment exists |
 | 6. Rollback | [Rollback specification](docs/06-rollback-specification/rollback-specification.md) | Designed; incident timeline can be simulated locally |
 | 7. Runbooks | [Deployment runbook](runbooks/deployment-runbook.md), [incident playbook](runbooks/incident-playbook.md) | Written; production steps remain unexecuted |
-| 8. Observability and DORA | [Observability](docs/08-observability/observability.md), [Grafana JSON](dashboards/grafana/novapay-overview.json), [mockup](dashboards/mockups/novapay-overview.svg) | Designed; no live metrics or DORA values |
+| 8. Observability and DORA | [Observability](docs/08-observability/observability.md), engineering/management/regulatory [Grafana exports](dashboards/grafana/), and [wireframes](dashboards/mockups/) | Three audience views and a 22-metric catalog drafted; no live pipeline metrics or DORA values |
 
 ## Current demo
 

@@ -33,7 +33,47 @@ These targets are project goals, not current measurements. No production deploym
 
 ## Dashboard and alert definitions
 
-`dashboards/grafana/novapay-overview.json` is an importable starting dashboard with templated Prometheus datasource selection. `dashboards/mockups/novapay-overview.svg` is a static design mockup. `pipeline/observability/prometheus-alerts.yml` contains example rules. Metric names must be supplied by actual instrumentation before these views can be considered live.
+The assessment requires at least 15 pipeline metrics and three audience-specific dashboard views. The catalog below defines 24 proposed metric families across build, compliance, deployment, and DORA. Only the local simulator request counter is currently emitted; the remaining metrics require workflow, policy, registry, deployment, or incident exporters. No dashboard shows fabricated measurements.
+
+| Category | Metric | Type and labels | Meaning |
+| --- | --- | --- | --- |
+| Build | `novapay_ci_runs_total` | Counter: `result` | Completed CI runs by outcome |
+| Build | `novapay_ci_duration_seconds` | Histogram: `workflow` | End-to-end and per-job runtime |
+| Build | `novapay_ci_queue_wait_seconds` | Histogram: `runner_class` | Time waiting for a runner |
+| Build | `novapay_test_cases_total` | Counter: `result`, `suite` | Unit, integration, and contract test outcomes |
+| Build | `novapay_line_coverage_ratio` | Gauge: `module` | Measured line coverage from a verified report |
+| Build | `novapay_build_cache_hit_ratio` | Gauge: `workflow` | Build cache hit fraction |
+| Compliance | `novapay_gate_evaluations_total` | Counter: `gate`, `result` | Required gate decisions by outcome |
+| Compliance | `novapay_security_findings` | Gauge: `scanner`, `severity` | Open findings by scanner and severity |
+| Compliance | `novapay_sbom_generated_total` | Counter: `format`, `result` | SBOM generation outcomes by format |
+| Compliance | `novapay_signature_verifications_total` | Counter: `result` | Artifact signature verification outcomes |
+| Compliance | `novapay_policy_decisions_total` | Counter: `policy`, `result` | OPA/Kyverno allow and deny decisions |
+| Compliance | `novapay_release_approval_events_total` | Counter: `environment`, `result`, `role` | Independent approval events by role |
+| Compliance | `novapay_evidence_completeness_ratio` | Gauge: `environment` | Required release evidence present fraction |
+| Compliance | `novapay_active_exceptions` | Gauge: `environment`, `severity` | Current, unexpired policy exceptions |
+| Deployment | `novapay_deployments_total` | Counter: `environment`, `strategy`, `result` | Deployment attempts and outcomes |
+| Deployment | `novapay_deployment_duration_seconds` | Histogram: `environment`, `strategy` | Apply-to-verified-ready duration |
+| Deployment | `novapay_canary_traffic_percent` | Gauge: `environment`, `deployment_color` | Candidate traffic share |
+| Deployment | `novapay_canary_error_ratio` | Gauge: `environment`, `deployment_color` | Candidate HTTP error fraction |
+| Deployment | `novapay_canary_p99_seconds` | Gauge: `environment`, `deployment_color` | Candidate p99 request latency |
+| Deployment | `novapay_health_checks_total` | Counter: `environment`, `result` | Post-deployment health and synthetic checks |
+| Deployment | `novapay_rollbacks_total` | Counter: `environment`, `category`, `reason` | Rollback events by trigger |
+| DORA | `novapay_dora_deployment_frequency` | Gauge: `environment`, `window` | Verified production promotions per window |
+| DORA | `novapay_dora_lead_time_seconds` | Gauge: `environment`, `window` | Median commit-to-verified-production time |
+| DORA | `novapay_dora_change_failure_ratio` | Gauge: `environment`, `window` | Failed production changes / all production changes |
+| DORA | `novapay_dora_time_to_restore_seconds` | Gauge: `environment`, `window` | Median incident-to-verified-stable duration |
+
+The engineering dashboard also uses these service-level metrics: `novapay_demo_http_requests_total` is emitted by the local demo; request-duration histogram buckets, active database pool connections, oldest queue-message age, and synthetic-check status remain planned instrumentation.
+
+Use bounded labels only; never add release digests, commit SHAs, customer identifiers, or payment references as metric labels. Keep those values in the access-controlled audit records.
+
+| Audience | Grafana export | Wireframe | Primary questions |
+| --- | --- | --- | --- |
+| Engineering | `dashboards/grafana/novapay-overview.json` | `dashboards/mockups/novapay-overview.svg` | Is the service healthy? What is the canary weight? Should rollout hold or roll back? |
+| Management | `dashboards/grafana/novapay-management.json` | `dashboards/mockups/novapay-management.svg` | How often do verified changes ship? What are lead time, failure rate, and restore time? |
+| Regulatory | `dashboards/grafana/novapay-regulatory.json` | `dashboards/mockups/novapay-regulatory.svg` | Which controls passed, which findings remain, and where is retained evidence? |
+
+All exports use a Prometheus datasource input. DORA panels show `N/A` until verified production and incident records are connected. `pipeline/observability/prometheus-alerts.yml` contains example rules. Metric names must be supplied by actual instrumentation before the dashboards can be considered live.
 
 Suggested labels are `environment`, `service`, `release_id`, and `deployment_color`. Never label a metric with account numbers, payment identifiers, email addresses, tokens, or other sensitive/high-cardinality values. Logs should include a correlation ID that is synthetic and non-sensitive.
 
@@ -46,7 +86,7 @@ Suggested labels are `environment`, `service`, `release_id`, and `deployment_col
 
 ## Current evidence and limitations
 
-The repository includes canary decision scripts that consume operator-supplied values, but they do not query Prometheus or calculate Welch's t-test/chi-squared statistics. No Grafana, Prometheus, live service metrics, or production release history is configured. The dashboard and alert rules are design artifacts until wired to a running stack.
+The repository includes canary decision scripts that consume operator-supplied values, but they do not query Prometheus or calculate Welch's t-test/chi-squared statistics. The local Java demo emits only its request counter; no Grafana, Prometheus, pipeline-metric exporter, or production release history is configured. The dashboard exports and alert rules are design artifacts until wired to a running stack.
 
 ## AI attribution
 
