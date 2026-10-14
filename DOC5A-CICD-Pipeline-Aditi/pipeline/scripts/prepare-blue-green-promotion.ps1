@@ -30,7 +30,8 @@ if ([DateTimeOffset]::UtcNow - $checkedAt -gt [TimeSpan]::FromMinutes(10)) {
     throw "Promotion blocked. Run the candidate check again; this report is over 10 minutes old."
 }
 
-$chartPath = Join-Path (Split-Path -Parent $PSScriptRoot) "pipeline\helm\novapay"
+$projectRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
+$chartPath = Join-Path $projectRoot "pipeline\helm\novapay"
 [pscustomobject]@{
     result = "READY"
     promote = "helm upgrade $ReleaseName $chartPath --reuse-values --set-string activeColor=$CandidateColor --wait --atomic --timeout 5m"

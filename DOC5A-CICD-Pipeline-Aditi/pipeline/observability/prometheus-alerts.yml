@@ -1,0 +1,40 @@
+groups:
+  - name: novapay-release-safety
+    interval: 30s
+    rules:
+      - alert: NovaPayHighHttp5xxRate
+        expr: sum(rate(http_requests_total{service="novapay-demo",status=~"5.."}[2m])) / clamp_min(sum(rate(http_requests_total{service="novapay-demo"}[2m])), 0.001) >= 0.05
+        for: 2m
+        labels:
+          severity: critical
+          action: rollback
+        annotations:
+          summary: NovaPay HTTP 5xx rate reached the Category A threshold
+          description: Freeze canary advancement and restore the last known-good traffic target.
+      - alert: NovaPayElevatedHttp5xxRate
+        expr: sum(rate(http_requests_total{service="novapay-demo",status=~"5.."}[5m])) / clamp_min(sum(rate(http_requests_total{service="novapay-demo"}[5m])), 0.001) >= 0.01
+        for: 5m
+        labels:
+          severity: warning
+          action: hold
+        annotations:
+          summary: NovaPay HTTP 5xx rate reached the Category B threshold
+          description: Freeze promotion and investigate; roll back if the signal persists or worsens.
+      - alert: NovaPayHighP99Latency
+        expr: histogram_quantile(0.99, sum by (le, environment, release_id) (rate(http_request_duration_seconds_bucket{service="novapay-demo"}[5m]))) >= 0.2
+        for: 5m
+        labels:
+          severity: warning
+          action: hold
+        annotations:
+          summary: NovaPay p99 latency is at or above 200 milliseconds
+          description: Freeze promotion and compare with the approved baseline and service SLO.
+      - alert: NovaPaySyntheticCheckMissing
+        expr: absent_over_time(novapay_synthetic_check_success{service="novapay-demo"}[2m])
+        for: 1m
+        labels:
+          severity: warning
+          action: hold
+        annotations:
+          summary: NovaPay synthetic-check telemetry is missing
+          description: Missing telemetry is not a passing signal; hold the release until checks recover.

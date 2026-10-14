@@ -1,0 +1,56 @@
+**********************
+PowerShell transcript start
+Start time: 20261014194950
+Username: LAPTOP-DABKELLD\ADITI
+RunAs User: LAPTOP-DABKELLD\ADITI
+Configuration Name: 
+Machine: LAPTOP-DABKELLD (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\Users\ADITI\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\powershell\pwsh.dll -Command try { [Console]::OutputEncoding=[System.Text.Encoding]::UTF8 } catch {}
+.\DOC5A-CICD-Pipeline-Aditi\pipeline\scripts\run-assessment-checks.ps1
+Process ID: 23572
+PSVersion: 7.6.5
+PSEdition: Core
+GitCommitId: 7.6.5
+OS: Microsoft Windows 10.0.26200
+Platform: Win32NT
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1, 6.0, 7.0
+PSRemotingProtocolVersion: 2.4
+SerializationVersion: 1.1.0.1
+WSManStackVersion: 3.0
+**********************
+Project: C:\Users\ADITI\OneDrive\Desktop\VScodeee\DevOps1Aproject\DOC5A-CICD-Pipeline-Aditi
+Evidence: C:\Users\ADITI\OneDrive\Desktop\VScodeee\DevOps1Aproject\DOC5A-CICD-Pipeline-Aditi\evidence\test-results\local-2026-10-14
+Source SHA-256: 696556E7DE591CD1008C00BD9C19A8EC140CD53AF006A8F9920BC7764C3887F2
+Java compiler: javac 24.0.1
+Helm: v3.22.0+g144ca65
+OPA: Version: 1.21.1
+Trivy: Version: 0.74.0
+Syft: Version:       1.54.0
+{
+  "check": "NovaPay source checks",
+  "result": "PASS",
+  "findings": []
+}
+
+
+{
+  "application": "novapay-demo",
+  "generatedAtUtc": "2026-10-14T14:19:55.2146564Z",
+  "javaReleaseTarget": 21,
+  "jdkModules": [
+    "java.base",
+    "jdk.httpserver"
+  ],
+  "vulnerabilityScan": "Not run; this is a module inventory, not a vulnerability scan or full SBOM."
+}
+Helm lint and rendering use an all-zero synthetic digest fixture; it is not a deployable image.
+
+
+
+
+
+Local evidence run completed.
+**********************
+PowerShell transcript end
+End time: 20261014195011
+**********************

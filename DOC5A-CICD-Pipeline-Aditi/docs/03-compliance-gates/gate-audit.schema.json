@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:novapay:schema:gate-audit:v1",
+  "title": "NovaPay pipeline gate audit record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "recordId",
+    "evaluatedAtUtc",
+    "gateId",
+    "gateVersion",
+    "sourceSha",
+    "artifactDigest",
+    "decision",
+    "findings",
+    "approvals",
+    "exception",
+    "evidenceUri"
+  ],
+  "properties": {
+    "recordId": { "type": "string", "minLength": 1 },
+    "evaluatedAtUtc": { "type": "string", "format": "date-time" },
+    "gateId": { "type": "string", "pattern": "^G[1-7]$" },
+    "gateVersion": { "type": "string", "minLength": 1 },
+    "sourceSha": { "type": "string", "pattern": "^[a-f0-9]{40,64}$" },
+    "artifactDigest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+    "environment": { "type": "string", "enum": ["dev", "staging", "pre-prod", "production"] },
+    "decision": { "type": "string", "enum": ["PASS", "FAIL", "EXCEPTION", "ERROR"] },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["findingId", "severity", "message", "remediation"],
+        "properties": {
+          "findingId": { "type": "string" },
+          "severity": { "type": "string", "enum": ["CRITICAL", "HIGH", "MEDIUM", "LOW", "INFO"] },
+          "message": { "type": "string" },
+          "remediation": { "type": "string" }
+        }
+      }
+    },
+    "approvals": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["role", "identity", "approvedAtUtc"],
+        "properties": {
+          "role": { "type": "string" },
+          "identity": { "type": "string" },
+          "approvedAtUtc": { "type": "string", "format": "date-time" }
+        }
+      }
+    },
+    "exception": {
+      "oneOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["exceptionId", "owner", "approvers", "reason", "compensatingControls", "createdAtUtc", "expiresAtUtc"],
+          "properties": {
+            "exceptionId": { "type": "string" },
+            "owner": { "type": "string" },
+            "approvers": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+            "reason": { "type": "string" },
+            "compensatingControls": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+            "createdAtUtc": { "type": "string", "format": "date-time" },
+            "expiresAtUtc": { "type": "string", "format": "date-time" }
+          }
+        }
+      ]
+    },
+    "evidenceUri": { "type": "string", "minLength": 1 },
+    "supersedes": { "type": ["string", "null"] }
+  }
+}

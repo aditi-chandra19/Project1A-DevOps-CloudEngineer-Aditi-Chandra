@@ -1,6 +1,16 @@
 name: NovaPay source gate and build
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - "DOC5A-CICD-Pipeline-Aditi/**"
+      - ".github/workflows/novapay-demo-build.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "DOC5A-CICD-Pipeline-Aditi/**"
+      - ".github/workflows/novapay-demo-build.yml"
   workflow_dispatch:
 
 permissions:
@@ -10,6 +20,9 @@ jobs:
   compile:
     name: Source gate and Java 21 compile
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: DOC5A-CICD-Pipeline-Aditi
     steps:
       - name: Check out source
         uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3
@@ -23,7 +36,7 @@ jobs:
 
       - name: Run local source safety gate
         shell: pwsh
-        run: ./scripts/check-source-policy.ps1
+        run: ./pipeline/scripts/check-source-policy.ps1
 
       - name: Compile without external dependencies
         shell: bash
@@ -36,4 +49,4 @@ jobs:
 
       - name: Inventory referenced JDK modules (not a vulnerability scan)
         shell: pwsh
-        run: ./scripts/inventory-java-modules.ps1
+        run: ./pipeline/scripts/inventory-java-modules.ps1

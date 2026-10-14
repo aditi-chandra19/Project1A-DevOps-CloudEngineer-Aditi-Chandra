@@ -1,6 +1,6 @@
 param(
-    [string]$ClassFile = (Join-Path (Split-Path -Parent $PSScriptRoot) ".build\com\novapay\demo\NovaPayDemo.class"),
-    [string]$OutputPath = (Join-Path (Split-Path -Parent $PSScriptRoot) ".build\dependency-inventory.json")
+    [string]$ClassFile = (Join-Path (Split-Path -Parent (Split-Path -Parent $PSScriptRoot)) ".build\com\novapay\demo\NovaPayDemo.class"),
+    [string]$OutputPath = (Join-Path (Split-Path -Parent (Split-Path -Parent $PSScriptRoot)) ".build\dependency-inventory.json")
 )
 
 $ErrorActionPreference = "Stop"

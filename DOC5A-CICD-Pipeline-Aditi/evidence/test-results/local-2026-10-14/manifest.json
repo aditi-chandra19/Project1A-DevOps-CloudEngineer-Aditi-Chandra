@@ -1,0 +1,15 @@
+{
+  "generatedAtUtc": "2026-10-14T14:20:11.7431892Z",
+  "sourceSha": "cec33d204550661a7cc51e849e325c8900f6c786",
+  "sourceSha256": "696556E7DE591CD1008C00BD9C19A8EC140CD53AF006A8F9920BC7764C3887F2",
+  "workingTreeChangesPresent": true,
+  "evidenceScope": "Local compilation, source rule, module inventory, Helm lint/rendering with a synthetic all-zero digest fixture, OPA syntax, filesystem scan, rendered-chart scan, and source JAR SBOM. The fixture is not a deployable image. No unit tests, container image scan, DAST, live deployment, or statistical canary was run.",
+  "outputs": [
+    "local-checks.log",
+    "dependency-inventory.json",
+    "novapay-rendered.yaml",
+    "trivy-filesystem.json",
+    "trivy-rendered-chart.json",
+    "novapay-demo.cdx.json"
+  ]
+}

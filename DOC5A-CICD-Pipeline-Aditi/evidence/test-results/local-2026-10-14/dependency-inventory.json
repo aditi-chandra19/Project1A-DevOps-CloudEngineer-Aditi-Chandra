@@ -1,0 +1,10 @@
+{
+  "application": "novapay-demo",
+  "generatedAtUtc": "2026-10-14T14:19:55.2146564Z",
+  "javaReleaseTarget": 21,
+  "jdkModules": [
+    "java.base",
+    "jdk.httpserver"
+  ],
+  "vulnerabilityScan": "Not run; this is a module inventory, not a vulnerability scan or full SBOM."
+}

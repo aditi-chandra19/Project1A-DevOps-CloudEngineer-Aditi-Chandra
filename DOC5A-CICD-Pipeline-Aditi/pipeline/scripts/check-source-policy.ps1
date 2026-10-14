@@ -1,5 +1,5 @@
 param(
-    [string]$SourcePath = (Join-Path (Split-Path -Parent $PSScriptRoot) "src\main\java\com\novapay\demo\NovaPayDemo.java")
+    [string]$SourcePath = (Join-Path (Split-Path -Parent (Split-Path -Parent $PSScriptRoot)) "src\main\java\com\novapay\demo\NovaPayDemo.java")
 )
 
 $ErrorActionPreference = "Stop"

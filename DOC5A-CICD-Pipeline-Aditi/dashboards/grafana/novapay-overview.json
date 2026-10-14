@@ -1,0 +1,86 @@
+{
+  "__inputs": [
+    {
+      "name": "DS_PROMETHEUS",
+      "label": "Prometheus",
+      "description": "Prometheus data source for NovaPay demo metrics",
+      "type": "datasource",
+      "pluginId": "prometheus",
+      "pluginName": "Prometheus"
+    }
+  ],
+  "annotations": {
+    "list": []
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": { "defaults": { "unit": "percentunit", "min": 0, "max": 1 }, "overrides": [] },
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 0 },
+      "id": 1,
+      "targets": [{ "expr": "1 - (sum(rate(http_requests_total{service=\"novapay-demo\",status=~\"5..\"}[5m])) / clamp_min(sum(rate(http_requests_total{service=\"novapay-demo\"}[5m])), 0.001))", "legendFormat": "Availability", "refId": "A" }],
+      "title": "Request success ratio",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": { "defaults": { "unit": "percentunit", "min": 0 }, "overrides": [] },
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 0 },
+      "id": 2,
+      "targets": [{ "expr": "sum(rate(http_requests_total{service=\"novapay-demo\",status=~\"5..\"}[5m])) / clamp_min(sum(rate(http_requests_total{service=\"novapay-demo\"}[5m])), 0.001)", "legendFormat": "HTTP 5xx", "refId": "A" }],
+      "title": "HTTP 5xx rate",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": { "defaults": { "unit": "s", "min": 0 }, "overrides": [] },
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 0 },
+      "id": 3,
+      "targets": [{ "expr": "histogram_quantile(0.99, sum by (le, environment, release_id) (rate(http_request_duration_seconds_bucket{service=\"novapay-demo\"}[5m])))", "legendFormat": "p99 {{release_id}}", "refId": "A" }],
+      "title": "Request latency p99",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": { "defaults": { "unit": "short", "min": 0 }, "overrides": [] },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "id": 4,
+      "targets": [{ "expr": "novapay_database_pool_active{service=\"novapay-demo\"}", "legendFormat": "Active connections", "refId": "A" }],
+      "title": "Database pool active connections",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": { "defaults": { "unit": "s", "min": 0 }, "overrides": [] },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+      "id": 5,
+      "targets": [{ "expr": "novapay_queue_oldest_message_age_seconds{service=\"novapay-demo\"}", "legendFormat": "Oldest message age", "refId": "A" }],
+      "title": "Queue oldest message age",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": { "defaults": { "unit": "short", "min": 0 }, "overrides": [] },
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 16 },
+      "id": 6,
+      "targets": [{ "expr": "novapay_dora_deployments_total{metric=~\"deployment_frequency|change_failure_rate|lead_time|time_to_restore\"}", "legendFormat": "{{metric}}", "refId": "A" }],
+      "title": "DORA metrics (publish only from verified release records)",
+      "type": "timeseries"
+    }
+  ],
+  "refresh": "30s",
+  "schemaVersion": 39,
+  "tags": ["novapay", "assessment", "design-only"],
+  "templating": { "list": [] },
+  "time": { "from": "now-6h", "to": "now" },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "NovaPay Release Safety and DORA",
+  "uid": "novapay-release-safety",
+  "version": 1
+}

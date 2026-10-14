@@ -5,7 +5,7 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
-$projectRoot = Split-Path -Parent $PSScriptRoot
+$projectRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
 $source = Join-Path $projectRoot "src\main\java\com\novapay\demo\NovaPayDemo.java"
 $build = Join-Path $projectRoot ".build"
 

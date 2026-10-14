@@ -1,0 +1,10 @@
+{
+  "SchemaVersion": 2,
+  "Trivy": {
+    "Version": "0.74.0"
+  },
+  "ReportID": "01a13ac8-bbe2-7460-a925-ca5d0ebba81f",
+  "CreatedAt": "2026-10-14T19:49:56.2582868+05:30",
+  "ArtifactName": "C:/Users/ADITI/OneDrive/Desktop/VScodeee/DevOps1Aproject/DOC5A-CICD-Pipeline-Aditi",
+  "ArtifactType": "filesystem"
+}
