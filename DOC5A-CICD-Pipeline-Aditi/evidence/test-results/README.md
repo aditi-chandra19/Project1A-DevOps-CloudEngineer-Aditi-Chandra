@@ -1,3 +1,3 @@
 # Test and scan results
 
-This folder is reserved for assessment evidence from actual runs. No new tests were run while preparing these architecture and assessment documents. Copy machine-generated reports here only after a reproducible command completes, and record its tool/version, source SHA, date, and result. Earlier local scans under the ignored `.build/security/` directory are summarized in the self-assessment and are not copied here as if they were fresh runs.
+This folder contains machine-generated evidence from reproducible local build and security checks. The dated run is in `local-2026-10-14/`; its `manifest.json` records the source SHA-256, tool versions, output names, and limitations. The run includes compilation and configuration/security scans, not unit tests, image scanning, DAST, or a live deployment.

@@ -1,0 +1,30 @@
+{
+  "generatedAtUtc": "2026-10-14T14:23:57.8409713Z",
+  "port": 18081,
+  "processId": 5648,
+  "result": "PASS",
+  "endpoints": [
+    {
+      "path": "/health/live",
+      "statusCode": 200,
+      "body": "{\"status\":\"UP\",\"check\":\"live\"}"
+    },
+    {
+      "path": "/health/ready",
+      "statusCode": 200,
+      "body": "{\"status\":\"UP\",\"check\":\"ready\"}"
+    },
+    {
+      "path": "/version",
+      "statusCode": 200,
+      "body": "{\"service\":\"novapay-demo\",\"version\":\"0.1.0+local\",\"gitSha\":\"local-demo\",\"environment\":\"local\"}"
+    },
+    {
+      "path": "/metrics",
+      "statusCode": 200,
+      "body": "# HELP novapay_demo_http_requests_total Requests handled by the local simulator.\n# TYPE novapay_demo_http_requests_total counter\nnovapay_demo_http_requests_total{route=\"/health/live\",status=\"200\"} 1\nnovapay_demo_http_requests_total{route=\"/health/ready\",status=\"200\"} 1\nnovapay_demo_http_requests_total{route=\"/version\",status=\"200\"} 1"
+    }
+  ],
+  "simulated": true,
+  "scope": "Local process demonstration only; no payment authorization or cloud deployment."
+}

@@ -4,26 +4,29 @@ Prepared 2026-10-14. Status refers to evidence present in this local working tre
 
 | Deliverable | Required evidence | Present evidence | Status | Remaining evidence/action |
 | --- | --- | --- | --- | --- |
-| 1. Pipeline architecture | 8+ stages, tools/versions, gates, thresholds, failure/retry behavior, service targets, diagram | Architecture, eight stage specifications, Draw.io source, PNG | Design complete | Owner review; run the CI workflow after it is pushed/available in the connected repository |
-| 2. Deployment strategy | Blue-green, four canary phases, quantitative rules, sessions/draining | Strategy with 1-2%, 5-10%, 25-50%, 100% phases; chart and local decision scripts | Design and partial local demo | Live traffic shifting, metrics-backed analysis, 24-hour bake evidence |
-| 3. Compliance gates | 6+ gates, thresholds, mappings, exception and audit trail | Seven-gate spec, audit JSON schema, three local OPA policies and local source gate | Design and partial local checks | Full SAST, DAST, dependency/image, IaC, license, evidence-gate runs and approvals |
+| 1. Pipeline architecture | 8+ stages, tools/versions, gates, thresholds, failure/retry behavior, service targets, diagram | Architecture, eight stage specifications, Draw.io source, PNG; local Java compile and source gate captured | Design complete; source/build locally demonstrated | Owner review; successful remote workflow evidence |
+| 2. Deployment strategy | Blue-green, four canary phases, quantitative rules, sessions/draining | Strategy with 1-2%, 5-10%, 25-50%, 100% phases; chart, local decision scripts, and passing local health/version/metrics endpoint capture | Design and partial local demo | Live traffic shifting, metrics-backed analysis, 24-hour bake evidence |
+| 3. Compliance gates | 6+ gates, thresholds, mappings, exception and audit trail | Seven-gate spec, audit JSON schema, three local OPA policies, source rule, OPA syntax check, Trivy filesystem and rendered-chart reports | Design and partial local checks | Full SAST, DAST, third-party dependency coverage, image, IaC, license, policy-input evaluation, evidence-gate runs and approvals |
 | 4. Database migration | Safe, backward-compatible migration and rollback evidence | Expand-migrate-contract design with SQL example and thresholds | Design only | Database, migrations, compatibility test, backfill and restore evidence |
 | 5. Promotion | Four environments, same artifact, approvals, audit record | Four-environment design and immutable digest rules | Design only | Configured environments, identities, promotion records and live deployment evidence |
 | 6. Rollback | Trigger taxonomy and 8-step procedure | Three-category thresholds and eight-step rollback specification | Design and simulation | Execute a controlled demonstration; capture recovery results from a real target if available |
 | 7. Runbooks | Deployment and incident response instructions | Deployment runbook, incident playbook, Friday incident simulation script | Documents complete | Owner review and demonstration evidence |
-| 8. Observability | DORA, metrics, alerting, dashboard mockup | DORA definitions/targets, Grafana JSON, SVG mockup, Prometheus alert rules | Design only | Instrument service, connect data source, verify alert delivery and collect real DORA sample windows |
+| 8. Observability | DORA, metrics, alerting, dashboard mockup | DORA definitions/targets, Grafana JSON, SVG mockup, Prometheus alert rules, local `/metrics` endpoint capture | Design and local metrics endpoint | Connect Prometheus/Grafana, verify alert delivery, and collect real DORA sample windows |
 
-## Local evidence already available
+## Local evidence captured on 2026-10-14
 
-- Java simulator source and local run script.
-- Helm blue-green templates and decision/promotion scripts.
-- OPA policy source and earlier local policy evaluation records.
-- Earlier local Trivy filesystem and rendered-chart results and Syft SBOM files under the ignored `.build/security/` directory. These are not checked-in assessment evidence and do not constitute an image scan or full dependency scan.
-- A GitHub Actions workflow definition. A successful remote workflow run has not been captured in this working tree.
+- Java 21 target compilation with local JDK 24 succeeded; the source-policy script reported PASS with zero findings. The JDK module inventory contains `java.base` and `jdk.httpserver`.
+- Helm lint passed with an all-zero synthetic digest fixture. The fixture is not a real/deployable image; chart defaults remain intentionally blank.
+- `opa check --strict` passed for the three Rego policies. This confirms syntax/compilation, not policy evaluation against Kubernetes admission inputs.
+- Trivy filesystem report contains no vulnerability or secret findings and detected no language-specific dependency files. It does not establish third-party Java dependency coverage.
+- Trivy configuration scan of rendered Helm output reports four findings: two Medium untrusted registry findings for placeholder image repositories and two Low default-namespace findings.
+- Syft generated a CycloneDX 1.7 SBOM from the local source JAR with two components. It is not a container-image SBOM.
+- Full logs and machine-readable outputs are stored in `evidence/test-results/local-2026-10-14/`.
+- A GitHub Actions workflow definition is present at the actual Git root. A successful remote workflow run has not been captured.
 
 ## Overall result
 
-The assessment documentation and local design artifacts are substantially assembled. The mandatory live zero-downtime demonstration and complete operational proof are not yet submission-ready because the required runtime, registry, cluster, data services, DAST target, and monitoring stack are not configured. The user requested that no software be installed without explicit permission. Any remaining setup requiring a new installation or account must wait for that authorization; all existing local tools can be used for the design and source-level demonstration.
+The assessment documentation, local source/build evidence, and local security/configuration checks are substantially assembled. The mandatory live zero-downtime demonstration and complete operational proof are not yet submission-ready because the required runtime, registry, cluster, data services, DAST target, and monitoring stack are not configured. No software or account was added. The current local chart findings remain open and must be resolved before any deployable chart can pass its policy gates.
 
 ## AI attribution
 

@@ -46,6 +46,20 @@ Use the installed Java 21 JDK and PowerShell. No external Java dependencies are 
 
 The demo prints a local simulator URL; it does not process real payments. The project does not require Docker or a Kubernetes installation for its source/build and documentation demonstration.
 
+To recreate the dated local build and scan evidence with the tools already installed, run:
+
+```powershell
+.\pipeline\scripts\run-assessment-checks.ps1
+```
+
+The script does not install tools or run unit tests. Review [the captured run summary](evidence/test-results/local-2026-10-14/scan-summary.md) before presenting the outputs.
+
+To compile and start the simulator briefly, request its liveness/readiness/version/metrics endpoints, then stop it and save the responses, run:
+
+```powershell
+.\pipeline\scripts\capture-local-demo.ps1
+```
+
 ## Submission status
 
 This package contains the assessment design deliverables and local demonstration artifacts. It is not a completed zero-downtime cloud deployment: container runtime, registry, Kubernetes, Istio, Argo CD, database, Prometheus/Grafana service, DAST target, branch protections, approval identities, and production evidence are not configured. See the self-assessment before claiming completion.
