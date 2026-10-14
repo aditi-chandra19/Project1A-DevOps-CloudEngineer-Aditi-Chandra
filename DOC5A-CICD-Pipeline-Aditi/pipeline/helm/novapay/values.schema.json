@@ -39,7 +39,7 @@
       "type": "object",
       "required": ["repository", "digest", "pullPolicy"],
       "properties": {
-        "repository": { "type": "string", "pattern": "^artifactory\\.novapay\\.example/novapay/[a-z0-9._/-]+$" },
+        "repository": { "type": "string", "pattern": "^[a-z0-9.-]+(?::[0-9]+)?/[a-z0-9._/-]+$" },
         "digest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
         "pullPolicy": { "type": "string", "enum": ["IfNotPresent", "Always"] }
       },

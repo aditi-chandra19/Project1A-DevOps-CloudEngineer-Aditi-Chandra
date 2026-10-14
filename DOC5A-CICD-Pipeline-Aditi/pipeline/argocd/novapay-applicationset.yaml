@@ -1,0 +1,45 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: novapay-environments
+  namespace: argocd
+spec:
+  goTemplate: true
+  goTemplateOptions:
+    - missingkey=error
+  generators:
+    - clusters:
+        selector:
+          matchExpressions:
+            - key: novapay.example/environment
+              operator: In
+              values:
+                - dev
+                - staging
+                - preprod
+                - prod
+  template:
+    metadata:
+      name: novapay-{{ index .metadata.labels "novapay.example/environment" }}
+      labels:
+        app.kubernetes.io/name: novapay-demo
+        novapay.example/environment: '{{ index .metadata.labels "novapay.example/environment" }}'
+    spec:
+      project: novapay
+      source:
+        repoURL: https://github.com/aditi-chandra19/Project1A-DevOps-CloudEngineer-Aditi-Chandra.git
+        targetRevision: '{{ index .metadata.annotations "novapay.example/source-revision" }}'
+        path: DOC5A-CICD-Pipeline-Aditi/pipeline/helm/novapay
+        helm:
+          values: |
+            activeColor: blue
+            images:
+              blue:
+                repository: {{ index .metadata.annotations "novapay.example/image-repository" | quote }}
+                digest: {{ index .metadata.annotations "novapay.example/blue-digest" | quote }}
+              green:
+                repository: {{ index .metadata.annotations "novapay.example/image-repository" | quote }}
+                digest: {{ index .metadata.annotations "novapay.example/green-digest" | quote }}
+      destination:
+        server: '{{ .server }}'
+        namespace: novapay-{{ index .metadata.labels "novapay.example/environment" }}

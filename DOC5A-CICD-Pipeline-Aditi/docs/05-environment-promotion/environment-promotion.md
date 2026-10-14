@@ -59,7 +59,7 @@ Promotion stops on any required gate failure, missing evidence, digest mismatch,
 
 ## Current implementation boundary
 
-The repository contains a manual GitHub Actions build workflow and Helm blue-green templates/scripts. It has no configured GitHub-hosted environment approvals, immutable registry, Kubernetes cluster, secret manager, or working production traffic. Dev→staging→pre-production→production promotion is therefore a design and local simulation target; it must not be reported as an executed cloud deployment.
+The repository contains a hosted build/security workflow, Helm blue-green templates/scripts, and an Argo CD Project/ApplicationSet template for separately registered environment clusters. The ApplicationSet uses a reviewed source revision and registry/image digests supplied by the Argo CD cluster records, and requires manual sync. No GitHub-hosted environment approvals, immutable registry, Argo CD server, Kubernetes cluster, secret manager, or working production traffic is configured. Dev→staging→pre-production→production promotion is therefore a design/configuration target; it must not be reported as an executed cloud deployment.
 
 ## AI attribution
 

@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: novapay
+  namespace: argocd
+spec:
+  description: NovaPay application deployment permissions
+  sourceRepos:
+    - https://github.com/aditi-chandra19/Project1A-DevOps-CloudEngineer-Aditi-Chandra.git
+  destinations:
+    - namespace: novapay-dev
+      server: '*'
+    - namespace: novapay-staging
+      server: '*'
+    - namespace: novapay-preprod
+      server: '*'
+    - namespace: novapay-prod
+      server: '*'
+  namespaceResourceWhitelist:
+    - group: apps
+      kind: Deployment
+    - group: ''
+      kind: Service

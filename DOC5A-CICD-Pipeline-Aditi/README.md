@@ -24,6 +24,7 @@ This project designs and demonstrates a controlled CI/CD pipeline for a fictiona
 - Local Java service: `src/main/java/com/novapay/demo/NovaPayDemo.java`
 - GitHub Actions workflow: [repository-root workflow](../.github/workflows/novapay-demo-build.yml)
 - Kubernetes chart: `pipeline/helm/novapay/`
+- Argo CD project and four-environment ApplicationSet template: `pipeline/argocd/` (requires registered clusters, credentials, and approved image digests)
 - OPA policies: `pipeline/policies/`
 - Local scripts: `pipeline/scripts/`
 - Container build definition: `Dockerfile`
