@@ -66,6 +66,7 @@ jobs:
         run: docker build --pull --tag novapay-demo:${{ github.sha }} .
 
       - name: Start the image and check the demo endpoints
+        id: smoke-test
         shell: bash
         run: |
           docker run --detach --name novapay-demo-ci \
@@ -119,6 +120,16 @@ jobs:
           exit-code: '0'
           scanners: vuln
 
+      - name: Run the OWASP ZAP baseline scan
+        if: always() && steps.smoke-test.outcome == 'success'
+        uses: zaproxy/action-baseline@de8ad967d3548d44ef623df22cf95c3b0baf8b25
+        with:
+          target: http://127.0.0.1:8080
+          allow_issue_writing: false
+          fail_action: true
+          artifact_name: novapay-zap-baseline-${{ github.sha }}
+          cmd_options: '-a -J zap-report.json -r zap-report.html'
+
       - name: Keep image scan and SBOM reports
         if: always()
         uses: actions/upload-artifact@v4
@@ -128,6 +139,8 @@ jobs:
             ${{ runner.temp }}/trivy-image-report.json
             ${{ runner.temp }}/novapay-image.cdx.json
             DOC5A-CICD-Pipeline-Aditi/payment-response.json
+            zap-report.json
+            zap-report.html
           if-no-files-found: warn
           retention-days: 30
 
