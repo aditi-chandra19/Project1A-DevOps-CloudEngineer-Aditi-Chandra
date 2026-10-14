@@ -2,7 +2,7 @@
 
 **Project:** DevOps & Cloud Engineer assessment  
 **Owner:** Aditi Chandra  
-**Status:** Assessment artifacts drafted; live cloud demonstration pending
+**Status:** Assessment work in progress; live cloud demonstration pending
 
 This project designs and demonstrates a controlled CI/CD pipeline for a fictional banking service. The Java application is a local simulator; it does not process real payments or connect to bank systems. The target design follows the assessment's eight canonical pipeline stages and separates controls that are demonstrated locally from controls that need a configured registry or Kubernetes environment.
 
@@ -12,7 +12,7 @@ This project designs and demonstrates a controlled CI/CD pipeline for a fictiona
 | --- | --- | --- |
 | 1. Pipeline architecture | [Architecture](docs/01-pipeline-architecture/architecture.md) | Designed; local tools and cloud gates are distinguished |
 | 2. Deployment strategies | [Blue-green and canary](docs/02-deployment-strategies/deployment-strategies.md) | Designed; traffic routing and statistical analysis are not live |
-| 3. Compliance gates | [Gate specifications](docs/03-compliance-gates/compliance-gates.md) | Designed; a subset of OPA/source checks exists locally |
+| 3. Compliance gates | [Gate specifications](docs/03-compliance-gates/compliance-gates.md) | Designed; local source/OPA checks exist; hosted image and DAST gates are configured, with run evidence pending |
 | 4. Database migration | [Migration strategy](docs/04-database-migration/database-migration.md) | Designed; application has no database |
 | 5. Environment promotion | [Promotion strategy](docs/05-environment-promotion/environment-promotion.md) | Designed; no four-environment deployment exists |
 | 6. Rollback | [Rollback specification](docs/06-rollback-specification/rollback-specification.md) | Designed; incident timeline can be simulated locally |
@@ -27,7 +27,7 @@ This project designs and demonstrates a controlled CI/CD pipeline for a fictiona
 - OPA policies: `pipeline/policies/`
 - Local scripts: `pipeline/scripts/`
 - Container build definition: `Dockerfile`
-- Infrastructure placeholder: `pipeline/terraform/README.md` (Terraform modules not implemented)
+- Terraform modules and dev example: `pipeline/terraform/` (not applied; no Terraform validation run yet)
 - Assessment coverage and known gaps: [self-assessment](evidence/self-assessment.md) and [ERRATA](ERRATA.md)
 - TRC review materials: `evidence/trc-presentation.pdf` (draft; owner review required)
 - Reflections: `evidence/reflections.md` (draft; personalize before submission)
@@ -62,7 +62,7 @@ To compile and start the simulator briefly, request its liveness/readiness/versi
 
 ## Submission status
 
-This package contains the assessment design deliverables and local demonstration artifacts. It is not a completed zero-downtime cloud deployment: container runtime, registry, Kubernetes, Istio, Argo CD, database, Prometheus/Grafana service, DAST target, branch protections, approval identities, and production evidence are not configured. See the self-assessment before claiming completion.
+This package contains the assessment design deliverables, local demo evidence, and hosted CI jobs for container build, image scanning, SBOM generation, and DAST. The hosted workflow results are not yet recorded in the repository. It is not a completed zero-downtime cloud deployment: a registry, Kubernetes cluster, Istio, Argo CD, database, Prometheus/Grafana service, branch protections, approval identities, and production evidence are not configured. See the self-assessment before claiming completion.
 
 ## AI attribution
 

@@ -1,0 +1,1 @@
+administrator_role_arn = "arn:aws:iam::000000000000:role/replace-before-use"
