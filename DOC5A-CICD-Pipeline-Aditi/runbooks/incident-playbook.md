@@ -50,7 +50,7 @@ Preserve alert/metric windows, logs, source and artifact digests, gate and appro
 
 ## Local incident simulation
 
-Run `pipeline/scripts/simulate-friday-incident.ps1` from the project directory to print the fictional Friday 5:07 PM IST SEV-1 timeline. It creates a report in standard output only; it does not send communications, alter traffic, or execute a rollback. Preserve its output as evidence only when the simulation is explicitly included in the assessment demonstration.
+Run `pipeline/scripts/simulate-friday-incident.ps1` from the project directory to evaluate the fictional Friday 5:07 PM IST SEV-1 signals. It writes a timestamped JSON decision record under `evidence/test-results/`. The canary evaluator should choose immediate rollback and reduce proposed candidate traffic from 10% to 0%. The recorded timeline is simulated; the script does not send communications, alter traffic, or verify recovery.
 
 ## AI attribution
 

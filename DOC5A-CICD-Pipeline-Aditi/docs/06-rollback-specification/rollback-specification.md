@@ -44,7 +44,7 @@ The incident commander closes the immediate rollback only after health remains s
 
 ## Current implementation boundary
 
-`pipeline/scripts/simulate-friday-incident.ps1` produces a fictional SEV-1 incident timeline using the 5% HTTP 5xx assessment threshold. Helm and the promotion/candidate scripts are plan-oriented. The repository does not currently route live traffic or execute a production rollback.
+`pipeline/scripts/simulate-friday-incident.ps1` evaluates the fictional SEV-1 incident through the canary decision script and writes a timestamped JSON record. The record shows the expected immediate rollback decision for 12% HTTP 5xx, database pool exhaustion, and a 35% payment gateway timeout rate. The timeline is simulated; Helm and promotion/candidate scripts remain plan-oriented. The repository does not currently route live traffic or execute a production rollback.
 
 ## AI attribution
 

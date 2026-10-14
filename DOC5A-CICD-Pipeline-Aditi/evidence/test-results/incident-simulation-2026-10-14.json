@@ -1,0 +1,130 @@
+{
+  "incident": "NovaPay fictional Friday 5:07 PM IST canary incident",
+  "incidentId": "NP-INC-SIM-20261014-200450",
+  "generatedAtUtc": "2026-10-14T14:34:50.8164879+00:00",
+  "simulated": true,
+  "executionStatus": "SIMULATION_ONLY",
+  "signals": {
+    "http5xxRatePercent": 12,
+    "http5xxDurationSeconds": 120,
+    "databasePoolExhausted": true,
+    "paymentGatewayTimeoutRatePercent": 35
+  },
+  "canaryDecision": {
+    "evaluation": "operator-supplied metrics; no live systems queried",
+    "currentTrafficPercent": 10,
+    "decision": "rollback-immediate",
+    "nextTrafficPercent": 0,
+    "immediateTriggers": [
+      "HTTP 5xx rate exceeded 5% for at least 60 seconds",
+      "Database connection pool is exhausted",
+      "Payment gateway timeout rate reached 35%"
+    ],
+    "escalatedTriggers": [],
+    "paymentGatewayTimeoutRatePercent": 35.0,
+    "onCallAcknowledged": false,
+    "reason": "An immediate rollback trigger is active. Set candidate traffic to zero and restore the last known good revision."
+  },
+  "trafficBeforePercent": 10,
+  "trafficAfterPercent": 0,
+  "rootCause": "The canary promotion gate was bypassed or ineffective, allowing a candidate to advance despite simultaneous error, database pool, and gateway timeout signals.",
+  "prevention": [
+    "Block advancement at HTTP 5xx >= 5% for 60 seconds.",
+    "Treat an exhausted payment database pool as an immediate rollback signal.",
+    "Trigger immediate rollback when gateway timeouts reach 35%.",
+    "Require fresh telemetry and successful policy evidence before promotion."
+  ],
+  "recoveryChecks": {
+    "executed": false,
+    "status": "NOT_RUN",
+    "required": [
+      "Last-known-good version serves traffic",
+      "Readiness passes",
+      "HTTP 5xx below 1% for 15 minutes",
+      "Database pool and gateway recover",
+      "Synthetic transaction passes",
+      "Pending operations are reconciled"
+    ]
+  },
+  "timeline": [
+    {
+      "offsetSeconds": 0,
+      "elapsed": "T+0",
+      "severity": "SEV-1",
+      "action": "Freeze canary advancement and declare a critical incident.",
+      "evidence": [
+        "Alert timestamps",
+        "Candidate digest",
+        "Canary traffic weight"
+      ],
+      "timestampUtc": "2026-10-14T14:34:50.8164879+00:00",
+      "executionStatus": "SIMULATED_NOT_EXECUTED"
+    },
+    {
+      "offsetSeconds": 30,
+      "elapsed": "T+30 seconds",
+      "severity": "SEV-1",
+      "action": "Set candidate traffic to zero and select the last-known-good slot.",
+      "evidence": [
+        "Route change record",
+        "Rollback start time",
+        "Operator identity"
+      ],
+      "timestampUtc": "2026-10-14T14:35:20.8164879+00:00",
+      "executionStatus": "SIMULATED_NOT_EXECUTED"
+    },
+    {
+      "offsetSeconds": 120,
+      "elapsed": "T+2 minutes",
+      "severity": "SEV-1",
+      "action": "Check readiness, error rate, database pool, gateway timeouts, queue depth, and the synthetic journey.",
+      "evidence": [
+        "Health results",
+        "Metric windows",
+        "Synthetic check result"
+      ],
+      "timestampUtc": "2026-10-14T14:36:50.8164879+00:00",
+      "executionStatus": "SIMULATED_NOT_EXECUTED"
+    },
+    {
+      "offsetSeconds": 300,
+      "elapsed": "T+5 minutes",
+      "severity": "SEV-1",
+      "action": "Keep rollback in place and reconcile pending operations before any replay.",
+      "evidence": [
+        "Impact estimate",
+        "Idempotency and duplicate check",
+        "Reconciliation owner"
+      ],
+      "timestampUtc": "2026-10-14T14:39:50.8164879+00:00",
+      "executionStatus": "SIMULATED_NOT_EXECUTED"
+    },
+    {
+      "offsetSeconds": 900,
+      "elapsed": "T+15 minutes",
+      "severity": "SEV-1",
+      "action": "Record verified impact and recovery state for the internal incident record.",
+      "evidence": [
+        "Verified impact summary",
+        "Recovery checks",
+        "Internal update timestamp"
+      ],
+      "timestampUtc": "2026-10-14T14:49:50.8164879+00:00",
+      "executionStatus": "SIMULATED_NOT_EXECUTED"
+    },
+    {
+      "offsetSeconds": 1800,
+      "elapsed": "T+30 minutes",
+      "severity": "Review",
+      "action": "Keep the failed release frozen and assign corrective actions before retry.",
+      "evidence": [
+        "Gate history",
+        "Root cause",
+        "Corrective action owners and dates"
+      ],
+      "timestampUtc": "2026-10-14T15:04:50.8164879+00:00",
+      "executionStatus": "SIMULATED_NOT_EXECUTED"
+    }
+  ],
+  "note": "Fictional assessment scenario. This report evaluates operator-supplied signals; it does not change traffic, contact responders, or claim recovery."
+}

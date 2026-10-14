@@ -7,6 +7,7 @@ param(
     [int]$Http5xxDurationSeconds = 0,
     [int]$ConsecutiveReadinessFailures = 0,
     [int]$OomKills = 0,
+    [double]$PaymentGatewayTimeoutRatePercent = 0,
     [switch]$CrashLoopBackOff,
     [switch]$DatabasePoolExhausted,
 
@@ -43,6 +44,9 @@ if ($CrashLoopBackOff) {
 }
 if ($DatabasePoolExhausted) {
     $immediateTriggers.Add("Database connection pool is exhausted")
+}
+if ($PaymentGatewayTimeoutRatePercent -ge 35) {
+    $immediateTriggers.Add("Payment gateway timeout rate reached 35%")
 }
 
 if ($BaselineP99Milliseconds -gt 0 -and
@@ -114,6 +118,7 @@ else {
     nextTrafficPercent = $nextTrafficPercent
     immediateTriggers = @($immediateTriggers)
     escalatedTriggers = @($escalatedTriggers)
+    paymentGatewayTimeoutRatePercent = $PaymentGatewayTimeoutRatePercent
     onCallAcknowledged = [bool]$OnCallAcknowledged
     reason = $reason
 } | ConvertTo-Json -Depth 4

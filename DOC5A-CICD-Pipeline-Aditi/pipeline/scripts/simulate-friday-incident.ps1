@@ -1,67 +1,102 @@
+param(
+    [string]$OutputPath = (Join-Path (Split-Path -Parent (Split-Path -Parent $PSScriptRoot)) ("evidence\test-results\incident-simulation-" + (Get-Date -Format "yyyy-MM-dd") + ".json"))
+)
+
 $ErrorActionPreference = "Stop"
+$projectRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
+$startUtc = [DateTimeOffset]::UtcNow
+
+$decisionJson = & (Join-Path $PSScriptRoot "evaluate-canary.ps1") `
+    -CurrentTrafficPercent 10 `
+    -Http5xxRatePercent 12 `
+    -Http5xxDurationSeconds 120 `
+    -PaymentGatewayTimeoutRatePercent 35 `
+    -DatabasePoolExhausted `
+    -PromotionChecksPassed
+$decision = $decisionJson | ConvertFrom-Json
+if ($decision.decision -ne "rollback-immediate" -or $decision.nextTrafficPercent -ne 0) {
+    throw "The incident signals did not produce the expected immediate rollback decision."
+}
 
 $timeline = @(
     [ordered]@{
-        time = "T+0"
-        simulated = $true
+        offsetSeconds = 0
+        elapsed = "T+0"
         severity = "SEV-1"
-        decision = "Freeze canary advancement and declare a critical incident."
-        signals = @("HTTP 500 rate is 12% (assessment rollback threshold: 5%).",
-                    "Primary PostgreSQL connection pool is exhausted.",
-                    "Payment gateway timeout rate is 35%.")
-        owner = "On-call SRE / Incident Commander"
-        evidence = @("Alert timestamps and metric windows", "Candidate image digest", "Canary traffic weight")
+        action = "Freeze canary advancement and declare a critical incident."
+        evidence = @("Alert timestamps", "Candidate digest", "Canary traffic weight")
     },
     [ordered]@{
-        time = "T+30 seconds"
-        simulated = $true
+        offsetSeconds = 30
+        elapsed = "T+30 seconds"
         severity = "SEV-1"
-        decision = "Set canary traffic to zero or switch blue-green routing to the last known good digest."
-        signals = @("Immediate rollback is triggered by the 5xx breach and pool exhaustion.")
-        owner = "Release Operator + DBA"
-        evidence = @("Route/traffic change record", "Pod and connection-pool events", "Rollback start time")
+        action = "Set candidate traffic to zero and select the last-known-good slot."
+        evidence = @("Route change record", "Rollback start time", "Operator identity")
     },
     [ordered]@{
-        time = "T+2 minutes"
-        simulated = $true
+        offsetSeconds = 120
+        elapsed = "T+2 minutes"
         severity = "SEV-1"
-        decision = "Verify prior revision health, database pool recovery, gateway timeouts, queue depth, and synthetic payment journey."
-        signals = @("Do not advance or deploy a hotfix while checks are failing.")
-        owner = "SRE + Payment Service Owner + DBA"
-        evidence = @("Readiness results", "Pool and gateway metrics", "Synthetic check result", "Queue and reconciliation status")
+        action = "Check readiness, error rate, database pool, gateway timeouts, queue depth, and the synthetic journey."
+        evidence = @("Health results", "Metric windows", "Synthetic check result")
     },
     [ordered]@{
-        time = "T+5 minutes"
-        simulated = $true
+        offsetSeconds = 300
+        elapsed = "T+5 minutes"
         severity = "SEV-1"
-        decision = "Keep rollback in place; identify pending operations and reconcile idempotently before any replay."
-        signals = @("Do not replay payments until duplicate processing has been ruled out.")
-        owner = "Incident Commander + Payment Operations"
-        evidence = @("Impact estimate", "Reconciliation summary", "Internal update timestamp")
+        action = "Keep rollback in place and reconcile pending operations before any replay."
+        evidence = @("Impact estimate", "Idempotency and duplicate check", "Reconciliation owner")
     },
     [ordered]@{
-        time = "T+15 minutes"
-        simulated = $true
+        offsetSeconds = 900
+        elapsed = "T+15 minutes"
         severity = "SEV-1"
-        decision = "Confirm service state and customer impact; use the organization's approved communication and reporting process."
-        signals = @("The scenario is fictional; no real customer or regulatory notification is implied.")
-        owner = "Incident Commander + Compliance Liaison"
-        evidence = @("Verified impact summary", "Approvals for any replay", "Communication record")
+        action = "Record verified impact and recovery state for the internal incident record."
+        evidence = @("Verified impact summary", "Recovery checks", "Internal update timestamp")
     },
     [ordered]@{
-        time = "T+30 minutes"
-        simulated = $true
+        offsetSeconds = 1800
+        elapsed = "T+30 minutes"
         severity = "Review"
-        decision = "Preserve the pipeline freeze for the failed change and record corrective actions before retrying the release."
-        signals = @("A promotion gate must prevent staging bypass; hotfixes still pass mandatory security and compliance gates.")
-        owner = "Engineering Lead + Security + SRE"
-        evidence = @("Change history", "Gate and approval events", "Postmortem action owners and dates")
+        action = "Keep the failed release frozen and assign corrective actions before retry."
+        evidence = @("Gate history", "Root cause", "Corrective action owners and dates")
     }
 )
 
-[ordered]@{
+foreach ($event in $timeline) {
+    $event.timestampUtc = $startUtc.AddSeconds($event.offsetSeconds).ToString("o")
+    $event.executionStatus = "SIMULATED_NOT_EXECUTED"
+}
+
+$report = [ordered]@{
     incident = "NovaPay fictional Friday 5:07 PM IST canary incident"
+    incidentId = "NP-INC-SIM-$(Get-Date -Format 'yyyyMMdd-HHmmss')"
+    generatedAtUtc = $startUtc.ToString("o")
     simulated = $true
-    automated_action = "Freeze promotion and restore the last known good traffic target."
+    executionStatus = "SIMULATION_ONLY"
+    signals = [ordered]@{
+        http5xxRatePercent = 12
+        http5xxDurationSeconds = 120
+        databasePoolExhausted = $true
+        paymentGatewayTimeoutRatePercent = 35
+    }
+    canaryDecision = $decision
+    trafficBeforePercent = 10
+    trafficAfterPercent = $decision.nextTrafficPercent
+    rootCause = "The canary promotion gate was bypassed or ineffective, allowing a candidate to advance despite simultaneous error, database pool, and gateway timeout signals."
+    prevention = @("Block advancement at HTTP 5xx >= 5% for 60 seconds.", "Treat an exhausted payment database pool as an immediate rollback signal.", "Trigger immediate rollback when gateway timeouts reach 35%.", "Require fresh telemetry and successful policy evidence before promotion.")
+    recoveryChecks = [ordered]@{
+        executed = $false
+        status = "NOT_RUN"
+        required = @("Last-known-good version serves traffic", "Readiness passes", "HTTP 5xx below 1% for 15 minutes", "Database pool and gateway recover", "Synthetic transaction passes", "Pending operations are reconciled")
+    }
     timeline = $timeline
-} | ConvertTo-Json -Depth 8
+    note = "Fictional assessment scenario. This report evaluates operator-supplied signals; it does not change traffic, contact responders, or claim recovery."
+}
+
+$outputDirectory = Split-Path -Parent $OutputPath
+New-Item -ItemType Directory -Force -Path $outputDirectory | Out-Null
+$report | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $OutputPath -Encoding utf8
+Write-Output "Simulation decision: $($decision.decision)"
+Write-Output "Evidence: $OutputPath"
+Get-Content -LiteralPath $OutputPath -Raw
