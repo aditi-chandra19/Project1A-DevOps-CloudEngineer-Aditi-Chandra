@@ -17,6 +17,28 @@ permissions:
   contents: read
 
 jobs:
+  terraform-validation:
+    name: Terraform format and configuration validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+
+      - name: Set up Terraform on the hosted runner
+        uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e
+        with:
+          terraform_version: 1.16.4
+          terraform_wrapper: false
+
+      - name: Check Terraform formatting
+        run: terraform fmt -check -recursive DOC5A-CICD-Pipeline-Aditi/pipeline/terraform
+
+      - name: Initialize providers without a backend
+        run: terraform -chdir=DOC5A-CICD-Pipeline-Aditi/pipeline/terraform/examples/dev init -backend=false -input=false
+
+      - name: Validate Terraform configuration
+        run: terraform -chdir=DOC5A-CICD-Pipeline-Aditi/pipeline/terraform/examples/dev validate -no-color
+
   compile:
     name: Source gate and Java 21 compile
     runs-on: ubuntu-latest
@@ -25,7 +47,7 @@ jobs:
         working-directory: DOC5A-CICD-Pipeline-Aditi
     steps:
       - name: Check out source
-        uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3
+        uses: actions/checkout@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
 
       - name: Check available JDK
         shell: bash
@@ -60,7 +82,7 @@ jobs:
         working-directory: DOC5A-CICD-Pipeline-Aditi
     steps:
       - name: Check out source
-        uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3
+        uses: actions/checkout@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
 
       - name: Build the demo image
         run: docker build --pull --tag novapay-demo:${{ github.sha }} .
@@ -132,7 +154,7 @@ jobs:
 
       - name: Keep image scan and SBOM reports
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
         with:
           name: novapay-container-security-${{ github.sha }}
           path: |

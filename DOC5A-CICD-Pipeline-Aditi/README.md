@@ -27,7 +27,7 @@ This project designs and demonstrates a controlled CI/CD pipeline for a fictiona
 - OPA policies: `pipeline/policies/`
 - Local scripts: `pipeline/scripts/`
 - Container build definition: `Dockerfile`
-- Terraform modules and dev example: `pipeline/terraform/` (not applied; no Terraform validation run yet)
+- Terraform modules and dev example: `pipeline/terraform/` (not applied; hosted format/validate job is configured, run evidence pending)
 - Assessment coverage and known gaps: [self-assessment](evidence/self-assessment.md) and [ERRATA](ERRATA.md)
 - TRC review materials: `evidence/trc-presentation.pdf` (draft; owner review required)
 - Reflections: `evidence/reflections.md` (draft; personalize before submission)
@@ -62,7 +62,7 @@ To compile and start the simulator briefly, request its liveness/readiness/versi
 
 ## Submission status
 
-This package contains the assessment design deliverables, local demo evidence, and hosted CI jobs for container build, image scanning, SBOM generation, and DAST. The hosted workflow results are not yet recorded in the repository. It is not a completed zero-downtime cloud deployment: a registry, Kubernetes cluster, Istio, Argo CD, database, Prometheus/Grafana service, branch protections, approval identities, and production evidence are not configured. See the self-assessment before claiming completion.
+This package contains the assessment design deliverables, local demo evidence, and hosted CI jobs for Terraform validation, container build, image scanning, SBOM generation, and DAST. The hosted workflow results are not yet recorded in the repository. It is not a completed zero-downtime cloud deployment: a registry, Kubernetes cluster, Istio, Argo CD, database, Prometheus/Grafana service, branch protections, approval identities, and production evidence are not configured. See the self-assessment before claiming completion.
 
 ## AI attribution
 
